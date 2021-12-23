@@ -1,4 +1,3 @@
-from cross_validation import RESULTS_DIR
 import utils
 import numpy as np
 import os
