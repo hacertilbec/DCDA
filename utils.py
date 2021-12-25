@@ -4,6 +4,14 @@ import random
 import pickle
 import os
 import matplotlib.pyplot as plt
+from pathlib import Path
+
+# Create all dirs
+Path("data/cleaned").mkdir(parents=True, exist_ok=True)
+Path("inputs/features").mkdir(parents=True, exist_ok=True)
+Path("outputs/models").mkdir(parents=True, exist_ok=True)
+Path("outputs/results/cv").mkdir(parents=True, exist_ok=True)
+Path("outputs/results/predictions").mkdir(parents=True, exist_ok=True)
 
 
 def save_pickle(dir, filename, var):
