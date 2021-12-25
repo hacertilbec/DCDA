@@ -10,7 +10,7 @@ INPUT_DIR = "./inputs/"
 FEATURES_DIR = os.path.join(INPUT_DIR, "features")
 OUTPUTS_DIR = "./outputs/"
 MODELS_DIR = os.path.join(OUTPUTS_DIR, "models")
-RESULTS_DIR = os.path.join(OUTPUTS_DIR, "results")
+RESULTS_DIR = os.path.join(OUTPUTS_DIR, "results/predictions/")
 
 epochs = 1000
 batch_size = 32

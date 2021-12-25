@@ -16,7 +16,7 @@ DATA_DIR = "./data/cleaned/"
 INPUT_DIR = "./inputs/"
 FEATURES_DIR = os.path.join(INPUT_DIR, "features")
 OUTPUTS_DIR = "./outputs/"
-RESULTS_DIR = os.path.join(OUTPUTS_DIR, "models")
+RESULTS_DIR = os.path.join(OUTPUTS_DIR, "results/cv/")
 
 epochs = 1000
 batch_size = 32
@@ -161,8 +161,8 @@ if __name__ == "__main__":
             f"{test_auc_scores.mean():.3f} +- {test_auc_scores.std():.3f}",
         )
     )
-    result_file = os.path.join(OUTPUTS_DIR, f"{data_name}_results.xlsx")
-    roc_file = os.path.join(OUTPUTS_DIR, f"{data_name}_roc_auc_curve.png")
+    result_file = os.path.join(RESULTS_DIR, f"{data_name}_results.xlsx")
+    roc_file = os.path.join(RESULTS_DIR, f"{data_name}_roc_auc_curve.png")
     RESULTS.to_excel(result_file)
     utils.plot_roc_auc_curve(roc_curve_data, roc_file)
     print(
