@@ -39,6 +39,7 @@ if __name__ == "__main__":
     assert data_name in ["CircR2Disease", "Circ2Disease"]
     # load data
     all_pairs = utils.load_pickle(INPUT_DIR, f"{data_name}_all_pairs.pkl")
+    print(len(all_pairs))
     all_labels = utils.load_pickle(INPUT_DIR, f"{data_name}_all_labels.pkl")
     [unique_circrnas, unique_diseases] = utils.load_pickle(
         INPUT_DIR, f"{data_name}_unique_circrnas_diseases.pkl"
@@ -145,11 +146,21 @@ if __name__ == "__main__":
         print(f"fold: {fold}", acc, f1, prec, rec, auc)
         fold += 1
 
-    test_acc_scores = np.array([acc for (acc, f1, prec, rec, auc) in test_scores])
-    test_f1_scores = np.array([f1 for (acc, f1, prec, rec, auc) in test_scores])
-    test_prec_scores = np.array([prec for (acc, f1, prec, rec, auc) in test_scores])
-    test_rec_scores = np.array([rec for (acc, f1, prec, rec, auc) in test_scores])
-    test_auc_scores = np.array([auc for (acc, f1, prec, rec, auc) in test_scores])
+    test_acc_scores = np.array(
+        [acc for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_f1_scores = np.array(
+        [f1 for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_prec_scores = np.array(
+        [prec for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_rec_scores = np.array(
+        [rec for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_auc_scores = np.array(
+        [auc for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
 
     RESULTS.append(
         (
@@ -163,7 +174,7 @@ if __name__ == "__main__":
     )
     result_file = os.path.join(RESULTS_DIR, f"{data_name}_results.xlsx")
     roc_file = os.path.join(RESULTS_DIR, f"{data_name}_roc_auc_curve.png")
-    RESULTS.to_excel(result_file)
+    pd.DataFrame(RESULTS).to_excel(result_file)
     utils.plot_roc_auc_curve(roc_curve_data, roc_file)
     print(
         f"Results are saved to:  {result_file}\nRoc AUC curve plot is saved to: {roc_file}"
