@@ -86,7 +86,7 @@ def get_negatif_samples(sample_size, pos_sample, x, y):
         rand_circrna = x[random.randint(0, x_size - 1)]
         rand_disease = y[random.randint(0, y_size - 1)]
         rand_sample = (rand_circrna, rand_disease)
-        if rand_sample not in pos_sample:
+        if (rand_sample not in pos_sample) and (rand_sample not in neg_sample):
             neg_sample.append(rand_sample)
     return neg_sample
 
@@ -131,7 +131,7 @@ def plot_roc_auc_curve(roc_curve_data, filename):
     plt.yticks(fontsize=14)
     plt.legend(loc="lower right", fontsize=18)
     plt.show()
-    plt.savefig(filename)
+    plt.savefig(filename, format="png")
 
 
 def sequence_similarity(seq1, seq2):

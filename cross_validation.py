@@ -11,6 +11,7 @@ import metrics
 from sklearn.metrics import (
     roc_curve,
 )
+import pandas as pd
 
 DATA_DIR = "./data/cleaned/"
 INPUT_DIR = "./inputs/"
@@ -48,9 +49,10 @@ if __name__ == "__main__":
     GIP_CD = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_CD.pkl")
     GIP_DC = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DC.pkl")
     GIP_DM = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DM.pkl")
+    SIM_DD = utils.load_pickle(FEATURES_DIR, f"{data_name}_SIM_DD.pkl")
 
     circrna_feature_matrices = [GIP_CD]
-    disease_feature_matrices = [GIP_DC, GIP_DM]
+    disease_feature_matrices = [GIP_DC, GIP_DM, SIM_DD]
 
     RESULTS = []
     test_scores = []
@@ -165,11 +167,11 @@ if __name__ == "__main__":
     RESULTS.append(
         (
             "average",
-            f"{test_acc_scores.mean():.3f} +- {test_acc_scores.std():.3f}",
-            f"{test_f1_scores.mean():.3f} +- {test_f1_scores.std():.3f}",
-            f"{test_prec_scores.mean():.3f} +- {test_prec_scores.std():.3f}",
-            f"{test_rec_scores.mean():.3f} +- {test_rec_scores.std():.3f}",
-            f"{test_auc_scores.mean():.3f} +- {test_auc_scores.std():.3f}",
+            f"{test_acc_scores.mean():.4f} +- {test_acc_scores.std():.3f}",
+            f"{test_f1_scores.mean():.4f} +- {test_f1_scores.std():.3f}",
+            f"{test_prec_scores.mean():.4f} +- {test_prec_scores.std():.3f}",
+            f"{test_rec_scores.mean():.4f} +- {test_rec_scores.std():.3f}",
+            f"{test_auc_scores.mean():.4f} +- {test_auc_scores.std():.3f}",
         )
     )
     result_file = os.path.join(RESULTS_DIR, f"{data_name}_results.xlsx")

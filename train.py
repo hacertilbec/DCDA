@@ -42,9 +42,10 @@ if __name__ == "__main__":
     GIP_CD = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_CD.pkl")
     GIP_DC = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DC.pkl")
     GIP_DM = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DM.pkl")
+    SIM_DD = utils.load_pickle(FEATURES_DIR, f"{data_name}_SIM_DD.pkl")
 
     circrna_feature_matrices = [GIP_CD]
-    disease_feature_matrices = [GIP_DC, GIP_DM]
+    disease_feature_matrices = [GIP_DC, GIP_DM, SIM_DD]
 
     X_train_circrna_vecs = np.array(
         [
