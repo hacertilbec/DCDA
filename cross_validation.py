@@ -11,6 +11,7 @@ import metrics
 from sklearn.metrics import (
     roc_curve,
 )
+import pandas as pd
 
 DATA_DIR = "./data/cleaned/"
 INPUT_DIR = "./inputs/"
@@ -39,6 +40,7 @@ if __name__ == "__main__":
     assert data_name in ["CircR2Disease", "Circ2Disease"]
     # load data
     all_pairs = utils.load_pickle(INPUT_DIR, f"{data_name}_all_pairs.pkl")
+    print(len(all_pairs))
     all_labels = utils.load_pickle(INPUT_DIR, f"{data_name}_all_labels.pkl")
     [unique_circrnas, unique_diseases] = utils.load_pickle(
         INPUT_DIR, f"{data_name}_unique_circrnas_diseases.pkl"
@@ -47,9 +49,10 @@ if __name__ == "__main__":
     GIP_CD = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_CD.pkl")
     GIP_DC = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DC.pkl")
     GIP_DM = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DM.pkl")
+    SIM_DD = utils.load_pickle(FEATURES_DIR, f"{data_name}_SIM_DD.pkl")
 
     circrna_feature_matrices = [GIP_CD]
-    disease_feature_matrices = [GIP_DC, GIP_DM]
+    disease_feature_matrices = [GIP_DC, GIP_DM, SIM_DD]
 
     RESULTS = []
     test_scores = []
@@ -145,25 +148,35 @@ if __name__ == "__main__":
         print(f"fold: {fold}", acc, f1, prec, rec, auc)
         fold += 1
 
-    test_acc_scores = np.array([acc for (acc, f1, prec, rec, auc) in test_scores])
-    test_f1_scores = np.array([f1 for (acc, f1, prec, rec, auc) in test_scores])
-    test_prec_scores = np.array([prec for (acc, f1, prec, rec, auc) in test_scores])
-    test_rec_scores = np.array([rec for (acc, f1, prec, rec, auc) in test_scores])
-    test_auc_scores = np.array([auc for (acc, f1, prec, rec, auc) in test_scores])
+    test_acc_scores = np.array(
+        [acc for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_f1_scores = np.array(
+        [f1 for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_prec_scores = np.array(
+        [prec for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_rec_scores = np.array(
+        [rec for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
+    test_auc_scores = np.array(
+        [auc for (acc, f1, prec, rec, auc, predicted_probas) in test_scores]
+    )
 
     RESULTS.append(
         (
             "average",
-            f"{test_acc_scores.mean():.3f} +- {test_acc_scores.std():.3f}",
-            f"{test_f1_scores.mean():.3f} +- {test_f1_scores.std():.3f}",
-            f"{test_prec_scores.mean():.3f} +- {test_prec_scores.std():.3f}",
-            f"{test_rec_scores.mean():.3f} +- {test_rec_scores.std():.3f}",
-            f"{test_auc_scores.mean():.3f} +- {test_auc_scores.std():.3f}",
+            f"{test_acc_scores.mean():.4f} +- {test_acc_scores.std():.3f}",
+            f"{test_f1_scores.mean():.4f} +- {test_f1_scores.std():.3f}",
+            f"{test_prec_scores.mean():.4f} +- {test_prec_scores.std():.3f}",
+            f"{test_rec_scores.mean():.4f} +- {test_rec_scores.std():.3f}",
+            f"{test_auc_scores.mean():.4f} +- {test_auc_scores.std():.3f}",
         )
     )
     result_file = os.path.join(RESULTS_DIR, f"{data_name}_results.xlsx")
     roc_file = os.path.join(RESULTS_DIR, f"{data_name}_roc_auc_curve.png")
-    RESULTS.to_excel(result_file)
+    pd.DataFrame(RESULTS).to_excel(result_file)
     utils.plot_roc_auc_curve(roc_curve_data, roc_file)
     print(
         f"Results are saved to:  {result_file}\nRoc AUC curve plot is saved to: {roc_file}"

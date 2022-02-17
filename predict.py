@@ -46,13 +46,17 @@ if __name__ == "__main__":
     )
     unique_diseases_str = "\n".join(unique_diseases)
 
-    assert (
-        disease_name in unique_diseases
-    ), f"Disease name is not valid. Pick one of the following diseases: {unique_diseases_str}"
+    if disease_name.lower() == "all":
+        disease_name = "all"
+    else:
+        assert (
+            disease_name in unique_diseases
+        ), f"Disease name is not valid. Pick one of the following diseases: {unique_diseases_str}"
 
     GIP_CD = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_CD.pkl")
     GIP_DC = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DC.pkl")
     GIP_DM = utils.load_pickle(FEATURES_DIR, f"{data_name}_GIP_DM.pkl")
+    SIM_DD = utils.load_pickle(FEATURES_DIR, f"{data_name}_SIM_DD.pkl")
 
     # load models
     autoencoder = load_model(os.path.join(MODELS_DIR, f"{data_name}_autoencoder.h5"))
@@ -64,16 +68,24 @@ if __name__ == "__main__":
     pairs_df["label"] = all_labels
     pos_samples = pairs_df[pairs_df.label == 1].drop("label", axis=1).values.tolist()
 
-    candidate_pairs = np.array(
-        [
-            [circRNA, disease_name]
-            for circRNA in unique_circrnas
-            if [circRNA, disease_name] not in pos_samples
-        ]
-    )
+    if disease_name == "all":
+        candidate_pairs = []
+        for circRNA in unique_circrnas:
+            for disease in unique_diseases:
+                if [circRNA, disease] not in pos_samples:
+                    candidate_pairs.append([circRNA, disease])
+        candidate_pairs = np.array(candidate_pairs)
+    else:
+        candidate_pairs = np.array(
+            [
+                [circRNA, disease_name]
+                for circRNA in unique_circrnas
+                if [circRNA, disease_name] not in pos_samples
+            ]
+        )
 
     circrna_feature_matrices = [GIP_CD]
-    disease_feature_matrices = [GIP_DC, GIP_DM]
+    disease_feature_matrices = [GIP_DC, GIP_DM, SIM_DD]
     X = candidate_pairs
 
     X_circrna_vecs = np.array(

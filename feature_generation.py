@@ -27,7 +27,9 @@ if __name__ == "__main__":
         os.path.join(DATA_DIR, f"{data_name}.csv"), sep="*", index_col=0
     )
 
-    data_df["Disease Name"] = data_df["Disease Name"].fillna(data_df["disease"])
+    if "disease" in data_df.columns:
+        data_df["Disease Name"] = data_df["Disease Name"].fillna(data_df["disease"])
+    data_df["Disease Name"].dropna(inplace=True)
     data_df = data_df.drop_duplicates(subset=["circRNA Name", "Disease Name"])
 
     unique_circrnas = data_df["circRNA Name"].unique().tolist()
@@ -70,6 +72,34 @@ if __name__ == "__main__":
     dm_width = utils.calculate_width(M_dm)
     GIP_DM = utils.get_GIP_matrix(unique_diseases, M_dm, dm_width)
 
+    # ------- GIP_CM -------
+    circbank = pd.read_csv("data/cleaned/circBank.csv", sep="*", index_col=0)
+
+    circ_mir_pairs = list(map(list, zip(circbank["circRNA Name"], circbank["miR_ID"])))
+    circbank_circrnas = circbank["circRNA Name"].unique().tolist()
+    circbank_mirnas = circbank["miR_ID"].unique().tolist()
+
+    M_cm = utils.interaction_matrix(
+        unique_circrnas, circbank_mirnas, circ_mir_pairs, [1] * len(circ_mir_pairs)
+    )
+    cm_width = utils.calculate_width(M_cm)
+    GIP_CM = utils.get_GIP_matrix(unique_circrnas, M_cm, cm_width)
+
+    # ------- SIM_CC -------
+    circ_seq_dict = utils.load_pickle(INPUT_DIR, "circrna_sequence_dict.pkl")
+    data_df["Sequence"] = data_df["circRNA Name"].replace(circ_seq_dict)
+    circrna_sequences = data_df[["circRNA Name", "Sequence"]].drop_duplicates()
+    circrna_sequences = dict(
+        zip(circrna_sequences["circRNA Name"], circrna_sequences["Sequence"])
+    )
+    SIM_CC = utils.get_sequence_sim_matrix(unique_circrnas, circrna_sequences)
+
+    # ------- SIM_DD -------
+    disease_mesh_tree_dict = utils.load_pickle(INPUT_DIR, "disease_mesh_tree_dict.pkl")
+    SIM_DD = utils.get_semantic_similarity_matrix(
+        unique_diseases, disease_mesh_tree_dict
+    )
+
     # ------- SAVE INPUT DATA -------
     utils.save_pickle(INPUT_DIR, f"{data_name}_all_pairs.pkl", all_pairs)
     utils.save_pickle(INPUT_DIR, f"{data_name}_all_labels.pkl", all_labels)
@@ -82,3 +112,6 @@ if __name__ == "__main__":
     utils.save_pickle(FEATURES_DIR, f"{data_name}_GIP_CD.pkl", GIP_CD)
     utils.save_pickle(FEATURES_DIR, f"{data_name}_GIP_DC.pkl", GIP_DC)
     utils.save_pickle(FEATURES_DIR, f"{data_name}_GIP_DM.pkl", GIP_DM)
+    utils.save_pickle(FEATURES_DIR, f"{data_name}_GIP_CM.pkl", GIP_CM)
+    utils.save_pickle(FEATURES_DIR, f"{data_name}_SIM_CC.pkl", SIM_CC)
+    utils.save_pickle(FEATURES_DIR, f"{data_name}_SIM_DD.pkl", SIM_DD)
