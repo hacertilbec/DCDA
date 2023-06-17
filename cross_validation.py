@@ -9,7 +9,7 @@ from sklearn.model_selection import (
 import models
 import metrics
 from sklearn.metrics import (
-    roc_curve,
+    roc_curve, precision_recall_curve
 )
 import pandas as pd
 
@@ -57,6 +57,7 @@ if __name__ == "__main__":
     RESULTS = []
     test_scores = []
     roc_curve_data = []
+    pr_curve_data = []
     pr_curve_data = []
     fold = 1
 
