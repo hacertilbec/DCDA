@@ -6,6 +6,7 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
+import numpy as np
 
 
 def recall_m(y_true, y_pred):
@@ -29,15 +30,9 @@ def f1_m(y_true, y_pred):
 
 
 def evaluate_model(model, X, y):
-    predicted_probas = model.predict_proba(X)
-    try:
-        predictions = model.predict_classes(X)
-    except:
-        predictions = model.predict(X)
-    try:
-        auc = roc_auc_score(y, predicted_probas[:, 1], average="weighted")
-    except:
-        auc = roc_auc_score(y, predicted_probas[:, 0], average="weighted")
+    predicted_probas = model.predict(X)
+    predictions = (np.array(predicted_probas) > 0.5).astype("int32")
+    auc = roc_auc_score(y, predicted_probas[:, 0], average="weighted")
     acc = accuracy_score(y, predictions)
     prec = precision_score(y, predictions)
     rec = recall_score(y, predictions)

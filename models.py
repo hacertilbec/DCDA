@@ -6,15 +6,15 @@ from keras.layers import Dense
 from keras.models import Sequential
 import numpy as np
 import random
-from tensorflow import set_random_seed
+from tensorflow.random import set_seed 
 from numpy.random import seed
 import os
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import keras
 
 seed_value = 0
 random.seed(seed_value)
-set_random_seed(seed_value)
+set_seed(seed_value)
 seed(seed_value)
 
 os.environ["PYTHONHASHSEED"] = "0"

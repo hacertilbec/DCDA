@@ -9,7 +9,7 @@ from sklearn.model_selection import (
 import models
 import metrics
 from sklearn.metrics import (
-    roc_curve,
+    roc_curve, precision_recall_curve
 )
 import pandas as pd
 
@@ -57,6 +57,7 @@ if __name__ == "__main__":
     RESULTS = []
     test_scores = []
     roc_curve_data = []
+    pr_curve_data = []
     fold = 1
 
     skf = StratifiedKFold(n_splits=5, shuffle=False)
@@ -144,6 +145,12 @@ if __name__ == "__main__":
         roc_curve_data.append(
             (fold, false_positive_rate, true_positive_rate, threshold)
         )
+        precision, recall, thresholds = precision_recall_curve(
+            y_test.reshape(y_test.shape[0], 1), predicted_probas
+        )
+        pr_curve_data.append(
+            (fold, recall, precision, threshold)
+        )
         RESULTS.append([fold, acc, f1, prec, rec, auc])
         print(f"fold: {fold}", acc, f1, prec, rec, auc)
         fold += 1
@@ -175,9 +182,11 @@ if __name__ == "__main__":
         )
     )
     result_file = os.path.join(RESULTS_DIR, f"{data_name}_results.xlsx")
-    roc_file = os.path.join(RESULTS_DIR, f"{data_name}_roc_auc_curve.png")
+    roc_file_path = os.path.join(RESULTS_DIR, f"{data_name}_roc_auc_curve.png")
+    pr_file_path = os.path.join(RESULTS_DIR, f"{data_name}_pr_curve.png")
     pd.DataFrame(RESULTS).to_excel(result_file)
-    utils.plot_roc_auc_curve(roc_curve_data, roc_file)
+    utils.plot_curve(roc_curve_data, roc_file_path, "False Positive Rate", "True Positive Rate")
+    utils.plot_curve(pr_curve_data, pr_file_path, "Recall", "Precision")
     print(
-        f"Results are saved to:  {result_file}\nRoc AUC curve plot is saved to: {roc_file}"
+        f"Results are saved to:  {result_file}\nROC AUC curve plot is saved to: {roc_file_path}\nPR curve plot is saved to: {pr_file_path}"
     )

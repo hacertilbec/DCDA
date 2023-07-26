@@ -5,7 +5,6 @@ import pickle
 import os
 import matplotlib.pyplot as plt
 from pathlib import Path
-from weighted_levenshtein import lev
 import tqdm
 
 
@@ -109,24 +108,24 @@ def get_disease_vec(all_diseases, feature_matrices, disease):
     return np.concatenate(vecs)
 
 
-def plot_roc_auc_curve(roc_curve_data, filename):
+def plot_curve(curve_data, filename, x_label, y_label):
     plt.subplots(1, figsize=(10, 10))
-    for fold, false_positive_rate, true_positive_rate, threshold in roc_curve_data:
+    for fold, x, y, threshold in curve_data:
         ek = "th"
         if fold == 2:
             ek = "nd"
         elif fold == 3:
             ek = "rd"
         plt.plot(
-            false_positive_rate,
-            true_positive_rate,
+            x,
+            y,
             label=f"{fold}{ek} Fold",
             linewidth=3,
         )
         plt.plot([0, 1], ls="--")
         plt.plot([0, 0], [1, 0], c=".7"), plt.plot([1, 1], c=".7")
-    plt.ylabel("True Positive Rate", fontsize=22)
-    plt.xlabel("False Positive Rate", fontsize=22)
+    plt.ylabel(y_label, fontsize=22)
+    plt.xlabel(x_label, fontsize=22)
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.legend(loc="lower right", fontsize=18)
@@ -143,6 +142,7 @@ def sequence_similarity(seq1, seq2):
 
 
 def get_sequence_sim_matrix(unique_circrnas, circrna_sequences):
+    from weighted_levenshtein import lev
     SIM_CC = np.empty((len(unique_circrnas), len(unique_circrnas)))
     SIM_CC[:] = -1
 
