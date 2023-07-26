@@ -5,7 +5,6 @@ import pickle
 import os
 import matplotlib.pyplot as plt
 from pathlib import Path
-from weighted_levenshtein import lev
 import tqdm
 
 
@@ -143,6 +142,7 @@ def sequence_similarity(seq1, seq2):
 
 
 def get_sequence_sim_matrix(unique_circrnas, circrna_sequences):
+    from weighted_levenshtein import lev
     SIM_CC = np.empty((len(unique_circrnas), len(unique_circrnas)))
     SIM_CC[:] = -1
 
